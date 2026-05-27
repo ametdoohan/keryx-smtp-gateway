@@ -6,6 +6,7 @@
 
 <h2>SMTP Settings</h2>
 <form method="post" action="/admin/settings">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
   <label>Mode</label>
   <select name="smtp_mode">
     <option value="smtp" <%= settings.smtp_mode === 'smtp' ? 'selected' : '' %>>SMTP</option>
@@ -19,6 +20,7 @@
 
 <h2>Create User</h2>
 <form method="post" action="/admin/users">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
   <input name="username" placeholder="username" required />
   <input type="password" name="password" placeholder="password" required />
   <select name="role"><option value="admin">admin</option><option value="superadmin">superadmin</option></select>

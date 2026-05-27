@@ -1,5 +1,7 @@
 const express = require('express');
 const session = require('express-session');
+const csrf = require('csurf');
+const { rateLimit } = require('express-rate-limit');
 const db = require('./db');
 const config = require('./config');
 
@@ -7,7 +9,30 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', `${process.cwd()}/src/views`);
 app.use(express.urlencoded({ extended: true }));
-app.use(session({ secret: config.sessionSecret, resave: false, saveUninitialized: false }));
+app.set('trust proxy', 1);
+app.use(session({
+  secret: config.sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: true,
+  },
+}));
+app.use(csrf());
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: 'Too many login attempts',
+});
 
 function auth(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
@@ -15,7 +40,7 @@ function auth(req, res, next) {
 }
 
 app.get('/login', (req, res) => res.render('login', { error: null }));
-app.post('/login', (req, res) => {
+app.post('/login', loginLimiter, (req, res) => {
   const user = db.getUserByUsername(req.body.username);
   if (!user || !db.verifyPassword(user, req.body.password) || !user.is_active) {
     return res.status(401).render('login', { error: 'Invalid credentials' });
@@ -70,6 +95,13 @@ app.get('/reports.csv', auth, (req, res) => {
   )].join('\n');
   res.setHeader('Content-Type', 'text/csv');
   res.send(csv);
+});
+
+app.use((err, req, res, next) => {
+  if (err && err.code === 'EBADCSRFTOKEN') {
+    return res.status(403).send('Invalid CSRF token');
+  }
+  return next(err);
 });
 
 module.exports = app;
