@@ -1,0 +1,41 @@
+<!doctype html>
+<html><body>
+<h1>Admin Dashboard</h1>
+<p>Welcome <%= user.username %></p>
+<p><a href="/reports">Open Reports</a></p>
+
+<h2>SMTP Settings</h2>
+<form method="post" action="/admin/settings">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <label>Mode</label>
+  <select name="smtp_mode">
+    <option value="smtp" <%= settings.smtp_mode === 'smtp' ? 'selected' : '' %>>SMTP</option>
+    <option value="smtps" <%= settings.smtp_mode === 'smtps' ? 'selected' : '' %>>SMTPS</option>
+    <option value="starttls" <%= settings.smtp_mode === 'starttls' ? 'selected' : '' %>>STARTTLS</option>
+  </select>
+  <input name="smtp_host" value="<%= settings.smtp_host %>" />
+  <input name="smtp_port" value="<%= settings.smtp_port %>" />
+  <button type="submit">Save</button>
+</form>
+
+<h2>Create User</h2>
+<form method="post" action="/admin/users">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <input name="username" placeholder="username" required />
+  <input type="password" name="password" placeholder="password" required />
+  <select name="role"><option value="admin">admin</option><option value="superadmin">superadmin</option></select>
+  <input name="daily_quota" value="1000" />
+  <input name="monthly_quota" value="20000" />
+  <input name="allowed_sender_domain" placeholder="allowed domain" />
+  <label>active <input type="checkbox" name="is_active" checked /></label>
+  <button type="submit">Create</button>
+</form>
+
+<h2>Users</h2>
+<table border="1" cellpadding="6">
+  <tr><th>ID</th><th>Username</th><th>Role</th><th>Active</th></tr>
+  <% users.forEach((u) => { %>
+    <tr><td><%= u.id %></td><td><%= u.username %></td><td><%= u.role %></td><td><%= u.is_active ? 'yes' : 'no' %></td></tr>
+  <% }) %>
+</table>
+</body></html>

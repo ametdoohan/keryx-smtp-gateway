@@ -1,0 +1,23 @@
+<!doctype html>
+<html><body>
+<h1>Reporting Dashboard</h1>
+<p><a href="/admin">Back</a></p>
+<form method="get" action="/reports">
+  <select name="status">
+    <option value="" <%= !status ? 'selected' : '' %>>all</option>
+    <option value="sent" <%= status === 'sent' ? 'selected' : '' %>>sent</option>
+    <option value="failed" <%= status === 'failed' ? 'selected' : '' %>>failed</option>
+  </select>
+  <button type="submit">Filter</button>
+  <a href="/reports.csv?status=<%= encodeURIComponent(status) %>">CSV</a>
+</form>
+<p>Total: <%= data.summary.total || 0 %> | Sent: <%= data.summary.sent || 0 %> | Failed: <%= data.summary.failed || 0 %></p>
+<table border="1" cellpadding="6">
+<tr><th>Time</th><th>From</th><th>To</th><th>Subject</th><th>Status</th><th>Error</th></tr>
+<% data.rows.forEach((r) => { %>
+  <tr>
+    <td><%= r.created_at %></td><td><%= r.from_address %></td><td><%= r.to_address %></td><td><%= r.subject %></td><td><%= r.status %></td><td><%= r.error_message || '' %></td>
+  </tr>
+<% }) %>
+</table>
+</body></html>

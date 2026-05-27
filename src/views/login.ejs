@@ -1,0 +1,11 @@
+<!doctype html>
+<html><body>
+<h1>Login</h1>
+<% if (error) { %><p><%= error %></p><% } %>
+<form method="post" action="/login">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <input name="username" placeholder="username" required />
+  <input type="password" name="password" placeholder="password" required />
+  <button type="submit">Login</button>
+</form>
+</body></html>
