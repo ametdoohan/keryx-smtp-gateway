@@ -1,78 +1,49 @@
 # keryx-smtp-gateway
 
-Keryx SMTP Gateway is an SMTP wrapper for AWS SES API.  
-It is designed to let existing SMTP-based applications deliver email through AWS SES without changing their email client integration.
+Keryx SMTP Gateway is an SMTP wrapper for AWS SES API. It allows SMTP-based applications to deliver mail via AWS SES.
 
-## Goals
+## Features (MVP)
 
-- Provide SMTP-compatible access to AWS SES.
-- Support SMTP protocol modes:
-  - SMTP
-  - SMTPS
-  - STARTTLS
-- Provide a web admin panel for user and protocol management.
-- Provide reporting and audit visibility for email traffic.
-- Support automatic TLS certificate provisioning for SMTPS.
+- SMTP gateway modes: `smtp`, `smtps`, `starttls`
+- Admin dashboard for SMTP settings and user management
+- Reporting dashboard with status filter and CSV export
+- SQLite persistence for users, settings, and message logs
+- Development TLS certificate auto-generation (self-signed fallback)
 
-## Planned Features
+## Quick Start
 
-### 1) SMTP Gateway Core
-- SMTP listener with configurable mode (SMTP / SMTPS / STARTTLS)
-- Authentication layer for SMTP users
-- User quota controls (daily/monthly)
-- Sender policy controls (allowed sender domain/address)
-- SES adapter using AWS SES API
+```bash
+cd /tmp/workspace/ametdoohan/keryx-smtp-gateway
+npm install
+npm run start
+```
 
-### 2) Admin Dashboard
-- User management (create, edit, disable, reset password)
-- SMTP protocol configuration (mode/host/port)
-- Gateway status visibility
-- Role model (superadmin/admin)
+- Web admin: `http://localhost:3000`
+- Default admin:
+  - username: `admin`
+  - password: `admin123`
 
-### 3) Reporting Dashboard
-- Delivery metrics (sent/failed)
-- Latency insights
-- Filter by status and date range
-- CSV export
-- Audit activity logs
+## Environment Variables
 
-### 4) TLS Certificate Management
-- Existing certificate loading
-- Auto-generated certificate for development fallback
-- ACME integration hooks for production automation
+- `APP_PORT` (default: `3000`)
+- `SESSION_SECRET` (default: `change-me`)
+- `SQLITE_PATH` (default: `data/gateway.db`)
+- `SMTP_MODE` (default: `smtps`)
+- `SMTP_HOST` (default: `0.0.0.0`)
+- `SMTP_PORT` (default: `2465`)
+- `SMTP_CERT_PATH` (default: `certs/smtp.crt`)
+- `SMTP_KEY_PATH` (default: `certs/smtp.key`)
+- `SES_DRY_RUN` (default: `true`)
+- `AWS_REGION` (default: `us-east-1`)
 
-## Architecture (High Level)
+## Notes
 
-1. SMTP client authenticates to gateway.
-2. Gateway validates user, policy, and quota.
-3. Message is forwarded to AWS SES API.
-4. Delivery attempt is logged for reporting and auditing.
-5. Admin dashboard manages users and SMTP settings.
+- SMTP settings updated in web admin are stored in SQLite and applied on next service restart.
+- In development, a self-signed certificate is generated automatically if certificate files do not exist.
+- For production, configure real TLS certificates and disable SES dry-run mode.
 
-## Database
+## Validation
 
-SQLite is the default database option for persistence:
-- User credentials and roles
-- SMTP settings
-- Message logs
-- Audit logs
-
-## Security Notes
-
-- Use strong password hashing (bcrypt/Argon2).
-- Enforce TLS for credential exchange in production.
-- Apply login/auth rate limiting and IP throttling.
-- Keep AWS credentials in environment variables or a secret manager.
-
-## Current Status
-
-This repository is currently focused on project direction and documentation.  
-Implementation can proceed incrementally from an MVP:
-
-1. SMTP auth + SES relay + basic admin user management
-2. Full reporting with bounce/complaint ingestion
-3. HA, observability, and advanced multi-tenant controls
-
-## Branch Workflow
-
-Requested working branch for this task: `copilot/development`.
+```bash
+npm test
+```
