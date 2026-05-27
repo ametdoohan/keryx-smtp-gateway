@@ -47,3 +47,35 @@ npm run start
 ```bash
 npm test
 ```
+
+## Docker
+
+Build image:
+
+```bash
+docker build -t keryx-smtp-gateway:latest .
+```
+
+Run container:
+
+```bash
+docker run --rm \
+  -p 3000:3000 \
+  -p 2465:2465 \
+  -e SESSION_SECRET=change-me \
+  -e AWS_REGION=us-east-1 \
+  -e SES_DRY_RUN=true \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/certs:/app/certs \
+  keryx-smtp-gateway:latest
+```
+
+## CI/CD Pipeline
+
+GitHub Actions workflow (`.github/workflows/ci-cd.yml`) runs:
+
+- unit test (`npm test`)
+- dependency security scan (`npm audit --audit-level=high`)
+- CodeQL security analysis
+- Docker image build + Trivy image scan (HIGH/CRITICAL)
+- Docker image push to GHCR on push to `main`
