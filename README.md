@@ -51,7 +51,7 @@ npm run start
 ## Notes
 
 - SMTP settings updated in web admin are stored in SQLite and applied on next service restart.
-- AWS region/credentials can be updated in web admin and are applied on next service restart.
+- AWS region/credentials can be updated in web admin and take effect immediately (no restart needed).
 - AWS credential values saved from the UI are encrypted before being stored in SQLite.
 - In development, a self-signed certificate is generated automatically if certificate files do not exist.
 - For production, configure real TLS certificates and disable SES dry-run mode.

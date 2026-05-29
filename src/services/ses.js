@@ -4,7 +4,7 @@ const db = require('../db');
 const { decryptSetting } = require('./secure-settings');
 
 class SESAdapter {
-  constructor() {
+  _buildClient() {
     const region = db.getSetting('aws_region', config.sesRegion);
     const accessKeyId = decryptSetting(db.getSetting('aws_access_key_id', process.env.AWS_ACCESS_KEY_ID || ''));
     const secretAccessKey = decryptSetting(db.getSetting('aws_secret_access_key', process.env.AWS_SECRET_ACCESS_KEY || ''));
@@ -14,12 +14,13 @@ class SESAdapter {
       sesConfig.credentials = { accessKeyId, secretAccessKey };
     }
 
-    this.client = new SESClient(sesConfig);
+    return new SESClient(sesConfig);
   }
 
   async sendRaw(raw) {
     if (config.sesDryRun) return { messageId: `dryrun-${Date.now()}` };
-    const out = await this.client.send(new SendRawEmailCommand({ RawMessage: { Data: raw } }));
+    const client = this._buildClient();
+    const out = await client.send(new SendRawEmailCommand({ RawMessage: { Data: raw } }));
     return { messageId: out.MessageId };
   }
 }
