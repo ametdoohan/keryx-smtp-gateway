@@ -6,6 +6,7 @@ Keryx SMTP Gateway is an SMTP wrapper for AWS SES API. It allows SMTP-based appl
 
 - SMTP gateway modes: `smtp`, `smtps`, `starttls`
 - Admin dashboard for SMTP settings and user management
+- Admin dashboard support for AWS SES region and credentials
 - Reporting dashboard with status filter and CSV export
 - SQLite persistence for users, settings, and message logs
 - Development TLS certificate auto-generation (self-signed fallback)
@@ -35,10 +36,15 @@ npm run start
 - `SMTP_KEY_PATH` (default: `certs/smtp.key`)
 - `SES_DRY_RUN` (default: `true`)
 - `AWS_REGION` (default: `us-east-1`)
+- `AWS_ACCESS_KEY_ID` (optional fallback when no UI value is set)
+- `AWS_SECRET_ACCESS_KEY` (optional fallback when no UI value is set)
+- `SETTINGS_ENCRYPTION_SECRET` (default: `SESSION_SECRET`, used to encrypt UI-saved secrets)
 
 ## Notes
 
 - SMTP settings updated in web admin are stored in SQLite and applied on next service restart.
+- AWS region/credentials can be updated in web admin and are applied on next service restart.
+- AWS credential values saved from the UI are encrypted before being stored in SQLite.
 - In development, a self-signed certificate is generated automatically if certificate files do not exist.
 - For production, configure real TLS certificates and disable SES dry-run mode.
 

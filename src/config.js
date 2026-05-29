@@ -11,4 +11,5 @@ module.exports = {
   sesRegion: process.env.AWS_REGION || 'us-east-1',
   sesDryRun: process.env.SES_DRY_RUN !== 'false',
   sessionSecret: process.env.SESSION_SECRET || 'change-me',
+  settingsEncryptionSecret: process.env.SETTINGS_ENCRYPTION_SECRET || process.env.SESSION_SECRET || 'change-me',
 };

@@ -4,6 +4,7 @@ const csrf = require('csurf');
 const { rateLimit } = require('express-rate-limit');
 const db = require('./db');
 const config = require('./config');
+const { encryptSetting } = require('./services/secure-settings');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -55,6 +56,9 @@ app.get('/admin', auth, (req, res) => {
     smtp_mode: db.getSetting('smtp_mode', config.smtpMode),
     smtp_host: db.getSetting('smtp_host', config.smtpHost),
     smtp_port: db.getSetting('smtp_port', config.smtpPort),
+    aws_region: db.getSetting('aws_region', config.sesRegion),
+    aws_access_key_id_configured: !!db.getSetting('aws_access_key_id', ''),
+    aws_secret_access_key_configured: !!db.getSetting('aws_secret_access_key', ''),
   };
   res.render('admin', { users, settings, user: req.session.user });
 });
@@ -76,9 +80,26 @@ app.post('/admin/settings', auth, (req, res) => {
   if (!['smtp', 'smtps', 'starttls'].includes(req.body.smtp_mode)) {
     return res.status(400).send('Invalid mode');
   }
+  const awsRegion = (req.body.aws_region || '').trim();
+  if (!awsRegion) return res.status(400).send('Invalid AWS region');
+
   db.setSetting('smtp_mode', req.body.smtp_mode);
   db.setSetting('smtp_host', req.body.smtp_host);
   db.setSetting('smtp_port', req.body.smtp_port);
+  db.setSetting('aws_region', awsRegion);
+
+  if (req.body.clear_aws_access_key_id === 'on') {
+    db.setSetting('aws_access_key_id', '');
+  } else if ((req.body.aws_access_key_id || '').trim()) {
+    db.setSetting('aws_access_key_id', encryptSetting(req.body.aws_access_key_id.trim()));
+  }
+
+  if (req.body.clear_aws_secret_access_key === 'on') {
+    db.setSetting('aws_secret_access_key', '');
+  } else if ((req.body.aws_secret_access_key || '').trim()) {
+    db.setSetting('aws_secret_access_key', encryptSetting(req.body.aws_secret_access_key.trim()));
+  }
+
   return res.redirect('/admin');
 });
 
