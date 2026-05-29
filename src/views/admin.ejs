@@ -74,6 +74,14 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
+              <label for="timezone" class="label">Display Timezone</label>
+              <input id="timezone" name="timezone" value="<%= settings.timezone %>" class="input" placeholder="Asia/Jakarta" />
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">IANA format (e.g. Asia/Jakarta, UTC, America/New_York)</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
               <label for="aws_access_key_id" class="label">AWS Access Key ID</label>
               <input id="aws_access_key_id" type="password" name="aws_access_key_id" class="input" placeholder="<%= settings.aws_access_key_id_configured ? '••••••••  (configured)' : 'Not set' %>" />
               <label class="inline-flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400 cursor-pointer">
@@ -133,6 +141,10 @@
           <div>
             <dt class="text-gray-500 dark:text-gray-400">Allowed Recipients</dt>
             <dd class="font-medium text-gray-900 dark:text-white mt-0.5"><%= settings.allowed_recipient_domains || 'All (unrestricted)' %></dd>
+          </div>
+          <div>
+            <dt class="text-gray-500 dark:text-gray-400">Timezone</dt>
+            <dd class="font-medium text-gray-900 dark:text-white mt-0.5"><%= settings.timezone %></dd>
           </div>
           <div>
             <dt class="text-gray-500 dark:text-gray-400">AWS Access Key</dt>

@@ -29,13 +29,14 @@ npm run start
 - Web admin: `http://localhost:3000`
 - Default admin:
   - username: `admin`
-  - password: `admin123`
+  - password: `admin123` (you will be forced to change this on first login)
 
 ## Environment Variables
 
 - `APP_PORT` (default: `3000`)
 - `SESSION_SECRET` (default: `change-me`)
 - `SQLITE_PATH` (default: `data/gateway.db`)
+- `TZ_DISPLAY` (default: `Asia/Jakarta`)
 - `SMTP_MODE` (default: `smtps`)
 - `SMTP_HOST` (default: `0.0.0.0`)
 - `SMTP_PORT` (default: `2465`)
@@ -60,6 +61,11 @@ npm run start
 ```bash
 npm test
 ```
+
+Runs 24 unit tests covering:
+- Encryption/decryption of stored secrets
+- Database operations (users, settings, message logs, reports)
+- Web route authentication and access control
 
 ## Docker
 

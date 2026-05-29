@@ -12,7 +12,7 @@ env:
 
 jobs:
   test:
-    name: Test
+    name: Unit Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,6 +24,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - name: Test summary
+        if: always()
+        run: echo "✅ Unit tests completed"
 
   security-scan:
     name: Dependency Security Scan
@@ -54,11 +57,11 @@ jobs:
         language: [javascript]
     steps:
       - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-      - uses: github/codeql-action/autobuild@v3
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/autobuild@v4
+      - uses: github/codeql-action/analyze@v4
 
   docker-build-scan:
     name: Docker Build and Image Scan
@@ -79,7 +82,7 @@ jobs:
           load: true
           tags: keryx-smtp-gateway:scan
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: keryx-smtp-gateway:scan
           format: sarif
@@ -87,8 +90,10 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: HIGH,CRITICAL
+          scanners: vuln
+          vuln-type: os
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: trivy-results.sarif

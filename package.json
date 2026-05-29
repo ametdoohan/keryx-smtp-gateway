@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node --test"
+    "test": "node --test test/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,6 @@
     "@aws-sdk/client-ses": "^3.1054.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.10.0",
-    "csurf": "^1.11.0",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",

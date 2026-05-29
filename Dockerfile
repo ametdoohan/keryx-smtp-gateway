@@ -1,21 +1,17 @@
-FROM node:22-bookworm-slim AS deps
+FROM node:22-alpine AS deps
 
 WORKDIR /app
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 make g++ \
-  && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache python3 make g++
 
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-FROM node:22-bookworm-slim AS runtime
+FROM node:22-alpine AS runtime
 
 WORKDIR /app
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends openssl \
-  && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
 ENV APP_PORT=3000

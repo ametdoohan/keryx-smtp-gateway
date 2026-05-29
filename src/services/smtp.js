@@ -27,7 +27,7 @@ function createServer({ mode, host, port, tls, ses }) {
       const user = db.getUserByUsername(username);
       if (!user || !user.is_active || !db.verifyPassword(user, password)) {
         // eslint-disable-next-line no-console
-        console.log('[SMTP] Auth failed:', { userFound: !!user, isActive: user?.is_active, passwordOk: user ? db.verifyPassword(user, password) : false });
+        console.log('[SMTP] Auth failed:', { username, userFound: !!user, isActive: !!user?.is_active });
         return cb(new Error('Invalid credentials'));
       }
       // eslint-disable-next-line no-console

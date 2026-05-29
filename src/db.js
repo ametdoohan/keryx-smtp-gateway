@@ -140,6 +140,10 @@ function toggleUserActive(id) {
   db.prepare('UPDATE users SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ?').run(id);
 }
 
+function updatePassword(id, newPassword) {
+  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(bcrypt.hashSync(newPassword, 10), id);
+}
+
 function deleteUser(id) {
   db.prepare('DELETE FROM users WHERE id = ?').run(id);
 }
@@ -152,6 +156,7 @@ module.exports = {
   listUsers,
   createUser,
   toggleUserActive,
+  updatePassword,
   deleteUser,
   setSetting,
   getSetting,
