@@ -24,6 +24,17 @@ app.use(session({
 app.use(csrf());
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
+  res.locals.formatTime = (utcStr) => {
+    if (!utcStr) return '';
+    const tz = db.getSetting('timezone', config.timezone);
+    try {
+      const date = new Date(utcStr + (utcStr.endsWith('Z') ? '' : 'Z'));
+      return date.toLocaleString('sv-SE', { timeZone: tz }).replace('T', ' ');
+    } catch {
+      return utcStr;
+    }
+  };
+  res.locals.timezone = db.getSetting('timezone', config.timezone);
   next();
 });
 
@@ -87,6 +98,7 @@ app.get('/admin', requireRole('admin', 'superadmin'), (req, res) => {
     aws_access_key_id_configured: !!db.getSetting('aws_access_key_id', ''),
     aws_secret_access_key_configured: !!db.getSetting('aws_secret_access_key', ''),
     allowed_recipient_domains: db.getSetting('allowed_recipient_domains', ''),
+    timezone: db.getSetting('timezone', config.timezone),
   };
   const flash = req.session.flash || null;
   delete req.session.flash;
@@ -172,6 +184,7 @@ app.post('/admin/settings', requireRole('superadmin'), (req, res) => {
   db.setSetting('smtp_port', req.body.smtp_port);
   db.setSetting('aws_region', awsRegion);
   db.setSetting('allowed_recipient_domains', (req.body.allowed_recipient_domains || '').trim());
+  db.setSetting('timezone', (req.body.timezone || 'Asia/Jakarta').trim());
 
   if (req.body.clear_aws_access_key_id === 'on') {
     db.setSetting('aws_access_key_id', '');

@@ -36,6 +36,7 @@ npm run start
 - `APP_PORT` (default: `3000`)
 - `SESSION_SECRET` (default: `change-me`)
 - `SQLITE_PATH` (default: `data/gateway.db`)
+- `TZ_DISPLAY` (default: `Asia/Jakarta`)
 - `SMTP_MODE` (default: `smtps`)
 - `SMTP_HOST` (default: `0.0.0.0`)
 - `SMTP_PORT` (default: `2465`)

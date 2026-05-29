@@ -74,7 +74,7 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Time</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Time (<%= timezone %>)</th>
             <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">User</th>
             <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">From</th>
             <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">To</th>
@@ -96,7 +96,7 @@
           <% } %>
           <% data.rows.forEach((r) => { %>
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-            <td class="py-3 px-4 text-gray-500 dark:text-gray-400 whitespace-nowrap text-xs"><%= r.created_at %></td>
+            <td class="py-3 px-4 text-gray-500 dark:text-gray-400 whitespace-nowrap text-xs"><%= formatTime(r.created_at) %></td>
             <td class="py-3 px-4 text-gray-700 dark:text-gray-300 text-xs font-medium"><%= r.auth_user || '—' %></td>
             <td class="py-3 px-4 text-gray-700 dark:text-gray-300 max-w-[180px] truncate"><%= r.from_address %></td>
             <td class="py-3 px-4 text-gray-700 dark:text-gray-300 max-w-[180px] truncate"><%= r.to_address %></td>
