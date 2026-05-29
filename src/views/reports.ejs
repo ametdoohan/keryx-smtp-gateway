@@ -1,23 +1,116 @@
-<!doctype html>
-<html><body>
-<h1>Reporting Dashboard</h1>
-<p><a href="/admin">Back</a></p>
-<form method="get" action="/reports">
-  <select name="status">
-    <option value="" <%= !status ? 'selected' : '' %>>all</option>
-    <option value="sent" <%= status === 'sent' ? 'selected' : '' %>>sent</option>
-    <option value="failed" <%= status === 'failed' ? 'selected' : '' %>>failed</option>
-  </select>
-  <button type="submit">Filter</button>
-  <a href="/reports.csv?status=<%= encodeURIComponent(status) %>">CSV</a>
-</form>
-<p>Total: <%= data.summary.total || 0 %> | Sent: <%= data.summary.sent || 0 %> | Failed: <%= data.summary.failed || 0 %></p>
-<table border="1" cellpadding="6">
-<tr><th>Time</th><th>From</th><th>To</th><th>Subject</th><th>Status</th><th>Error</th></tr>
-<% data.rows.forEach((r) => { %>
-  <tr>
-    <td><%= r.created_at %></td><td><%= r.from_address %></td><td><%= r.to_address %></td><td><%= r.subject %></td><td><%= r.status %></td><td><%= r.error_message || '' %></td>
-  </tr>
-<% }) %>
-</table>
-</body></html>
+<%- include('partials/head', { title: 'Reports' }) %>
+<%- include('partials/nav') %>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Page header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Reports</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Email delivery history and status</p>
+    </div>
+    <a href="/reports.csv?status=<%= encodeURIComponent(status) %>" class="btn-secondary gap-2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+      </svg>
+      Export CSV
+    </a>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="card flex items-center gap-4">
+      <div class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+        <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= data.summary.total || 0 %></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Total Emails</p>
+      </div>
+    </div>
+    <div class="card flex items-center gap-4">
+      <div class="w-12 h-12 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
+        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-green-700 dark:text-green-400"><%= data.summary.sent || 0 %></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Sent</p>
+      </div>
+    </div>
+    <div class="card flex items-center gap-4">
+      <div class="w-12 h-12 rounded-lg bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold text-red-700 dark:text-red-400"><%= data.summary.failed || 0 %></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Failed</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="card mb-6">
+    <form method="get" action="/reports" class="flex flex-wrap items-end gap-4">
+      <div>
+        <label for="status_filter" class="label">Status</label>
+        <select id="status_filter" name="status" class="input w-40">
+          <option value="" <%= !status ? 'selected' : '' %>>All</option>
+          <option value="sent" <%= status === 'sent' ? 'selected' : '' %>>Sent</option>
+          <option value="failed" <%= status === 'failed' ? 'selected' : '' %>>Failed</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">Apply Filter</button>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="card p-0 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Time</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">From</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">To</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Subject</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Status</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Error</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+          <% if (data.rows.length === 0) { %>
+          <tr>
+            <td colspan="6" class="py-12 text-center text-gray-400 dark:text-gray-500">
+              <svg class="w-10 h-10 mx-auto mb-2 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
+              </svg>
+              No emails found
+            </td>
+          </tr>
+          <% } %>
+          <% data.rows.forEach((r) => { %>
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <td class="py-3 px-4 text-gray-500 dark:text-gray-400 whitespace-nowrap text-xs"><%= r.created_at %></td>
+            <td class="py-3 px-4 text-gray-700 dark:text-gray-300 max-w-[180px] truncate"><%= r.from_address %></td>
+            <td class="py-3 px-4 text-gray-700 dark:text-gray-300 max-w-[180px] truncate"><%= r.to_address %></td>
+            <td class="py-3 px-4 text-gray-900 dark:text-white max-w-[200px] truncate font-medium"><%= r.subject %></td>
+            <td class="py-3 px-4">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= r.status === 'sent' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300' %>">
+                <%= r.status %>
+              </span>
+            </td>
+            <td class="py-3 px-4 text-red-600 dark:text-red-400 text-xs max-w-[200px] truncate"><%= r.error_message || '' %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

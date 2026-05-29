@@ -1,49 +1,193 @@
-<!doctype html>
-<html><body>
-<h1>Admin Dashboard</h1>
-<p>Welcome <%= user.username %></p>
-<p><a href="/reports">Open Reports</a></p>
+<%- include('partials/head', { title: 'Dashboard' }) %>
+<%- include('partials/nav') %>
 
-<h2>SMTP Settings</h2>
-<form method="post" action="/admin/settings">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-  <label>Mode</label>
-  <select name="smtp_mode">
-    <option value="smtp" <%= settings.smtp_mode === 'smtp' ? 'selected' : '' %>>SMTP</option>
-    <option value="smtps" <%= settings.smtp_mode === 'smtps' ? 'selected' : '' %>>SMTPS</option>
-    <option value="starttls" <%= settings.smtp_mode === 'starttls' ? 'selected' : '' %>>STARTTLS</option>
-  </select>
-  <input name="smtp_host" value="<%= settings.smtp_host %>" />
-  <input name="smtp_port" value="<%= settings.smtp_port %>" />
-  <label>AWS Region</label>
-  <input name="aws_region" value="<%= settings.aws_region %>" />
-  <label>AWS Access Key ID</label>
-  <input type="password" name="aws_access_key_id" placeholder="<%= settings.aws_access_key_id_configured ? 'configured' : 'not set' %>" />
-  <label>clear <input type="checkbox" name="clear_aws_access_key_id" /></label>
-  <label>AWS Secret Access Key</label>
-  <input type="password" name="aws_secret_access_key" placeholder="<%= settings.aws_secret_access_key_configured ? 'configured' : 'not set' %>" />
-  <label>clear <input type="checkbox" name="clear_aws_secret_access_key" /></label>
-  <button type="submit">Save</button>
-</form>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Page header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage SMTP settings and users</p>
+  </div>
 
-<h2>Create User</h2>
-<form method="post" action="/admin/users">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-  <input name="username" placeholder="username" required />
-  <input type="password" name="password" placeholder="password" required />
-  <select name="role"><option value="admin">admin</option><option value="superadmin">superadmin</option></select>
-  <input name="daily_quota" value="1000" />
-  <input name="monthly_quota" value="20000" />
-  <input name="allowed_sender_domain" placeholder="allowed domain" />
-  <label>active <input type="checkbox" name="is_active" checked /></label>
-  <button type="submit">Create</button>
-</form>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- SMTP Settings -->
+    <div class="lg:col-span-2">
+      <div class="card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-lg bg-brand-50 dark:bg-brand-900/50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">SMTP Settings</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Configure your gateway connection</p>
+          </div>
+        </div>
 
-<h2>Users</h2>
-<table border="1" cellpadding="6">
-  <tr><th>ID</th><th>Username</th><th>Role</th><th>Active</th></tr>
-  <% users.forEach((u) => { %>
-    <tr><td><%= u.id %></td><td><%= u.username %></td><td><%= u.role %></td><td><%= u.is_active ? 'yes' : 'no' %></td></tr>
-  <% }) %>
-</table>
-</body></html>
+        <form method="post" action="/admin/settings" class="space-y-5">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label for="smtp_mode" class="label">Mode</label>
+              <select id="smtp_mode" name="smtp_mode" class="input">
+                <option value="smtp" <%= settings.smtp_mode === 'smtp' ? 'selected' : '' %>>SMTP</option>
+                <option value="smtps" <%= settings.smtp_mode === 'smtps' ? 'selected' : '' %>>SMTPS</option>
+                <option value="starttls" <%= settings.smtp_mode === 'starttls' ? 'selected' : '' %>>STARTTLS</option>
+              </select>
+            </div>
+            <div>
+              <label for="smtp_host" class="label">Host</label>
+              <input id="smtp_host" name="smtp_host" value="<%= settings.smtp_host %>" class="input" />
+            </div>
+            <div>
+              <label for="smtp_port" class="label">Port</label>
+              <input id="smtp_port" name="smtp_port" value="<%= settings.smtp_port %>" class="input" />
+            </div>
+          </div>
+
+          <hr class="border-gray-100 dark:border-gray-700" />
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="aws_region" class="label">AWS Region</label>
+              <input id="aws_region" name="aws_region" value="<%= settings.aws_region %>" class="input" placeholder="us-east-1" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="aws_access_key_id" class="label">AWS Access Key ID</label>
+              <input id="aws_access_key_id" type="password" name="aws_access_key_id" class="input" placeholder="<%= settings.aws_access_key_id_configured ? '••••••••  (configured)' : 'Not set' %>" />
+              <label class="inline-flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400 cursor-pointer">
+                <input type="checkbox" name="clear_aws_access_key_id" class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-500 dark:bg-gray-700" />
+                Clear stored key
+              </label>
+            </div>
+            <div>
+              <label for="aws_secret_access_key" class="label">AWS Secret Access Key</label>
+              <input id="aws_secret_access_key" type="password" name="aws_secret_access_key" class="input" placeholder="<%= settings.aws_secret_access_key_configured ? '••••••••  (configured)' : 'Not set' %>" />
+              <label class="inline-flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400 cursor-pointer">
+                <input type="checkbox" name="clear_aws_secret_access_key" class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-500 dark:bg-gray-700" />
+                Clear stored key
+              </label>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" class="btn-primary">Save Settings</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Create User -->
+    <div>
+      <div class="card">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">New User</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Add a gateway user</p>
+          </div>
+        </div>
+
+        <form method="post" action="/admin/users" class="space-y-4">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div>
+            <label for="new_username" class="label">Username</label>
+            <input id="new_username" name="username" required class="input" placeholder="jdoe" />
+          </div>
+          <div>
+            <label for="new_password" class="label">Password</label>
+            <input id="new_password" type="password" name="password" required class="input" placeholder="Strong password" />
+          </div>
+          <div>
+            <label for="new_role" class="label">Role</label>
+            <select id="new_role" name="role" class="input">
+              <option value="admin">Admin</option>
+              <option value="superadmin">Superadmin</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="daily_quota" class="label">Daily Quota</label>
+              <input id="daily_quota" name="daily_quota" value="1000" class="input" />
+            </div>
+            <div>
+              <label for="monthly_quota" class="label">Monthly Quota</label>
+              <input id="monthly_quota" name="monthly_quota" value="20000" class="input" />
+            </div>
+          </div>
+          <div>
+            <label for="allowed_sender_domain" class="label">Allowed Domain</label>
+            <input id="allowed_sender_domain" name="allowed_sender_domain" class="input" placeholder="example.com" />
+          </div>
+          <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+            <input type="checkbox" name="is_active" checked class="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-500 dark:bg-gray-700" />
+            Active
+          </label>
+          <div class="pt-2">
+            <button type="submit" class="btn-primary w-full justify-center">Create User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="mt-8">
+    <div class="card">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
+          <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21 12.318 12.318 0 0 1 2.25 19.234v-.106A6.375 6.375 0 0 1 8.625 12.75a6.375 6.375 0 0 1 6.163 4.308M11.25 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Users</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400"><%= users.length %> registered user<%= users.length !== 1 ? 's' : '' %></p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">ID</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Username</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Role</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <% users.forEach((u) => { %>
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              <td class="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs"><%= u.id %></td>
+              <td class="py-3 px-4 font-medium text-gray-900 dark:text-white"><%= u.username %></td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= u.role === 'superadmin' ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300' %>">
+                  <%= u.role %>
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center gap-1 text-xs font-medium <%= u.is_active ? 'text-green-700 dark:text-green-400' : 'text-gray-400 dark:text-gray-500' %>">
+                  <span class="w-1.5 h-1.5 rounded-full <%= u.is_active ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600' %>"></span>
+                  <%= u.is_active ? 'Active' : 'Inactive' %>
+                </span>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

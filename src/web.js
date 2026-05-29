@@ -18,7 +18,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
   },
 }));
 app.use(csrf());
@@ -40,6 +40,7 @@ function auth(req, res, next) {
   return next();
 }
 
+app.get('/', (req, res) => res.redirect('/login'));
 app.get('/login', (req, res) => res.render('login', { error: null }));
 app.post('/login', loginLimiter, (req, res) => {
   const user = db.getUserByUsername(req.body.username);
@@ -48,6 +49,10 @@ app.post('/login', loginLimiter, (req, res) => {
   }
   req.session.user = { id: user.id, username: user.username, role: user.role };
   return res.redirect('/admin');
+});
+
+app.post('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/login'));
 });
 
 app.get('/admin', auth, (req, res) => {
@@ -105,7 +110,7 @@ app.post('/admin/settings', auth, (req, res) => {
 
 app.get('/reports', auth, (req, res) => {
   const data = db.report(req.query.status || '');
-  res.render('reports', { data, status: req.query.status || '' });
+  res.render('reports', { data, status: req.query.status || '', user: req.session.user });
 });
 
 app.get('/reports.csv', auth, (req, res) => {
