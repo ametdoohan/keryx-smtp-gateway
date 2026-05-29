@@ -1,0 +1,18 @@
+<%- include('partials/head', { title: 'Access Denied' }) %>
+<%- include('partials/nav') %>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 mb-6">
+      <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+      </svg>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Access Denied</h1>
+    <p class="text-gray-500 dark:text-gray-400 mb-6">You don't have permission to access this page.</p>
+    <p class="text-sm text-gray-400 dark:text-gray-500 mb-8">Your role: <span class="font-medium text-gray-600 dark:text-gray-300"><%= user.role %></span></p>
+    <a href="/reports" class="btn-primary">Go to Reports</a>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

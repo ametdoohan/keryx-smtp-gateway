@@ -75,6 +75,7 @@
         <thead>
           <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
             <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Time</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">User</th>
             <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">From</th>
             <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">To</th>
             <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">Subject</th>
@@ -85,7 +86,7 @@
         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
           <% if (data.rows.length === 0) { %>
           <tr>
-            <td colspan="6" class="py-12 text-center text-gray-400 dark:text-gray-500">
+            <td colspan="7" class="py-12 text-center text-gray-400 dark:text-gray-500">
               <svg class="w-10 h-10 mx-auto mb-2 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
               </svg>
@@ -96,6 +97,7 @@
           <% data.rows.forEach((r) => { %>
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <td class="py-3 px-4 text-gray-500 dark:text-gray-400 whitespace-nowrap text-xs"><%= r.created_at %></td>
+            <td class="py-3 px-4 text-gray-700 dark:text-gray-300 text-xs font-medium"><%= r.auth_user || '—' %></td>
             <td class="py-3 px-4 text-gray-700 dark:text-gray-300 max-w-[180px] truncate"><%= r.from_address %></td>
             <td class="py-3 px-4 text-gray-700 dark:text-gray-300 max-w-[180px] truncate"><%= r.to_address %></td>
             <td class="py-3 px-4 text-gray-900 dark:text-white max-w-[200px] truncate font-medium"><%= r.subject %></td>
