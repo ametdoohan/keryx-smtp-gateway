@@ -1,6 +1,6 @@
 {
   "name": "keryx-smtp-gateway",
-  "version": "0.1.0-b",
+  "version": "0.1.1",
   "description": "Keryx SMTP Gateway is an SMTP wrapper for AWS SES API.   It is designed to let existing SMTP-based applications deliver email through AWS SES without changing their email client integration.",
   "main": "src/server.js",
   "scripts": {
