@@ -29,7 +29,7 @@ npm run start
 - Web admin: `http://localhost:3000`
 - Default admin:
   - username: `admin`
-  - password: `admin123`
+  - password: `admin123` (you will be forced to change this on first login)
 
 ## Environment Variables
 

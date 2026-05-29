@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const csrf = require('csurf');
+const crypto = require('crypto');
 const { rateLimit } = require('express-rate-limit');
 const db = require('./db');
 const config = require('./config');
@@ -21,9 +21,30 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
   },
 }));
-app.use(csrf());
+
+// CSRF protection (replaces deprecated csurf)
+function generateCsrfToken(req) {
+  if (!req.session.csrfSecret) {
+    req.session.csrfSecret = crypto.randomBytes(32).toString('hex');
+  }
+  return crypto.createHmac('sha256', req.session.csrfSecret)
+    .update(req.sessionID)
+    .digest('hex');
+}
+
+function csrfProtection(req, res, next) {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  const token = req.body._csrf || req.headers['x-csrf-token'];
+  const expected = generateCsrfToken(req);
+  if (!token || token !== expected) {
+    return res.status(403).send('Invalid CSRF token');
+  }
+  return next();
+}
+
+app.use(csrfProtection);
 app.use((req, res, next) => {
-  res.locals.csrfToken = req.csrfToken();
+  res.locals.csrfToken = generateCsrfToken(req);
   res.locals.formatTime = (utcStr) => {
     if (!utcStr) return '';
     const tz = db.getSetting('timezone', config.timezone);
@@ -78,8 +99,43 @@ app.post('/login', loginLimiter, (req, res) => {
     return res.status(401).render('login', { error: 'Invalid credentials' });
   }
   req.session.user = { id: user.id, username: user.username, role: user.role };
+
+  // Force password reset if using default password
+  if (db.verifyPassword(user, 'admin123')) {
+    req.session.mustResetPassword = true;
+    return res.redirect('/change-password');
+  }
+
   // Redirect based on role
   if (user.role === 'user') return res.redirect('/reports');
+  return res.redirect('/admin');
+});
+
+// --- Forced password change ---
+app.get('/change-password', auth, (req, res) => {
+  if (!req.session.mustResetPassword) return res.redirect('/admin');
+  res.render('change-password', { user: req.session.user, error: null });
+});
+
+app.post('/change-password', auth, (req, res) => {
+  if (!req.session.mustResetPassword) return res.redirect('/admin');
+  const { new_password, confirm_password } = req.body;
+
+  if (!new_password || new_password.length < 8) {
+    return res.render('change-password', { user: req.session.user, error: 'Password must be at least 8 characters' });
+  }
+  if (new_password !== confirm_password) {
+    return res.render('change-password', { user: req.session.user, error: 'Passwords do not match' });
+  }
+  if (new_password === 'admin123') {
+    return res.render('change-password', { user: req.session.user, error: 'Cannot reuse the default password' });
+  }
+
+  db.updatePassword(req.session.user.id, new_password);
+  delete req.session.mustResetPassword;
+  req.session.flash = 'Password changed successfully';
+
+  if (req.session.user.role === 'user') return res.redirect('/reports');
   return res.redirect('/admin');
 });
 
@@ -219,13 +275,6 @@ app.get('/reports.csv', auth, (req, res) => {
   )].join('\n');
   res.setHeader('Content-Type', 'text/csv');
   res.send(csv);
-});
-
-app.use((err, req, res, next) => {
-  if (err && err.code === 'EBADCSRFTOKEN') {
-    return res.status(403).send('Invalid CSRF token');
-  }
-  return next(err);
 });
 
 module.exports = app;

@@ -110,6 +110,18 @@ describe('Database', () => {
     });
   });
 
+  describe('updatePassword', () => {
+    it('should update user password', () => {
+      db.createUser({ username: 'pwchange', password: 'oldpass', role: 'user', is_active: true });
+      const user = db.getUserByUsername('pwchange');
+      assert.ok(db.verifyPassword(user, 'oldpass'));
+      db.updatePassword(user.id, 'newpass123');
+      const updated = db.getUserByUsername('pwchange');
+      assert.ok(!db.verifyPassword(updated, 'oldpass'));
+      assert.ok(db.verifyPassword(updated, 'newpass123'));
+    });
+  });
+
   describe('settings', () => {
     it('should set and get a setting', () => {
       db.setSetting('test_key', 'test_value');

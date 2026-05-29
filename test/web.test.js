@@ -95,4 +95,44 @@ describe('Web Routes', () => {
     assert.equal(res.status, 401);
     assert.ok(res.body.includes('Invalid credentials'));
   });
+
+  it('POST /login with default password should redirect to /change-password', async () => {
+    const loginPage = await request('/login');
+    const csrfMatch = loginPage.body.match(/name="_csrf" value="([^"]+)"/);
+    const cookieHeader = loginPage.headers['set-cookie'];
+    const cookie = cookieHeader ? (Array.isArray(cookieHeader) ? cookieHeader : [cookieHeader]).map((c) => c.split(';')[0]).join('; ') : '';
+
+    const res = await request('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': cookie,
+      },
+      body: `username=admin&password=admin123&_csrf=${encodeURIComponent(csrfMatch[1])}`,
+    });
+    assert.equal(res.status, 302);
+    assert.ok(res.headers.location.includes('/change-password'));
+  });
+
+  it('POST without CSRF token should return 403', async () => {
+    const loginPage = await request('/login');
+    const cookieHeader = loginPage.headers['set-cookie'];
+    const cookie = cookieHeader ? (Array.isArray(cookieHeader) ? cookieHeader : [cookieHeader]).map((c) => c.split(';')[0]).join('; ') : '';
+
+    const res = await request('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': cookie,
+      },
+      body: 'username=admin&password=admin123',
+    });
+    assert.equal(res.status, 403);
+  });
+
+  it('GET /change-password without auth should redirect to /login', async () => {
+    const res = await request('/change-password');
+    assert.equal(res.status, 302);
+    assert.ok(res.headers.location.includes('/login'));
+  });
 });
