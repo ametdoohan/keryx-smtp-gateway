@@ -10,6 +10,13 @@ Keryx SMTP Gateway is an SMTP wrapper for AWS SES API. It allows SMTP-based appl
 - Reporting dashboard with status filter and CSV export
 - SQLite persistence for users, settings, and message logs
 - Development TLS certificate auto-generation (self-signed fallback)
+- Modern UI with Tailwind CSS (responsive, card-based layout)
+- Dark mode with system preference detection and manual toggle (persisted in localStorage)
+- Logout functionality (session destroy via POST)
+- Flash messages on admin dashboard confirming settings/user saves
+- Role-based access control: `superadmin`, `admin`, `user` with distinct permissions
+- User management: toggle active status, delete users, role hierarchy enforcement
+- SMTP domain enforcement: per-user sender domain, per-user recipient domain, global recipient domain whitelist
 
 ## Quick Start
 
