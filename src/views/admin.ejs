@@ -15,6 +15,14 @@
   </select>
   <input name="smtp_host" value="<%= settings.smtp_host %>" />
   <input name="smtp_port" value="<%= settings.smtp_port %>" />
+  <label>AWS Region</label>
+  <input name="aws_region" value="<%= settings.aws_region %>" />
+  <label>AWS Access Key ID</label>
+  <input type="password" name="aws_access_key_id" placeholder="<%= settings.aws_access_key_id_configured ? 'configured' : 'not set' %>" />
+  <label>clear <input type="checkbox" name="clear_aws_access_key_id" /></label>
+  <label>AWS Secret Access Key</label>
+  <input type="password" name="aws_secret_access_key" placeholder="<%= settings.aws_secret_access_key_configured ? 'configured' : 'not set' %>" />
+  <label>clear <input type="checkbox" name="clear_aws_secret_access_key" /></label>
   <button type="submit">Save</button>
 </form>
 
