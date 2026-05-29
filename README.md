@@ -61,6 +61,11 @@ npm run start
 npm test
 ```
 
+Runs 24 unit tests covering:
+- Encryption/decryption of stored secrets
+- Database operations (users, settings, message logs, reports)
+- Web route authentication and access control
+
 ## Docker
 
 Build image:

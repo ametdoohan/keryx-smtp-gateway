@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
   - Global `allowed_recipient_domains` setting: fallback restriction when per-user recipient domain is empty. Leave empty to allow all recipients.
 - **Flash messages** — Admin dashboard now shows a green success banner after saving settings or creating a user, confirming the action was applied.
 - **SMTP error resilience** — TLS handshake errors (e.g. plain telnet to SMTPS port) no longer crash the server; they are logged and the server continues.
+- **Unit test suite** — 24 tests using Node.js built-in test runner covering secure-settings encryption, database CRUD, user management, and web route auth.
 - **SMTP auth debug logging** — Auth attempts are logged to stdout with username and method for troubleshooting.
 - **Logout** — POST `/logout` route that destroys the session and redirects to login. A logout icon button is shown in the navigation bar next to the username.
 - **Dark mode support** — Toggle between light and dark themes via a button in the navigation bar (sun/moon icon). Preference is persisted in `localStorage` and respects the system `prefers-color-scheme` on first visit.
